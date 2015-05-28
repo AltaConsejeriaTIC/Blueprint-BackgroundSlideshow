@@ -12,7 +12,10 @@ var cbpBGSlideshow = (function() {
 
 	var $slideshow = $( '#cbp-bislideshow' ),
 		$items = $slideshow.children( 'li' ),
-		itemsCount = $items.length,
+  		itemsCount = $items.length,
+               $yt_videos = {},
+               // Dejar este valor en cero para reproducir la totalidad del video
+               $video_timeout = 0,
 		$controls = $( '#cbp-bicontrols' ),
 		navigation = {
 			$navPrev : $controls.find( 'span.cbp-biprev' ),
@@ -110,8 +113,30 @@ var cbpBGSlideshow = (function() {
 		isSlideshowActive = true;
 		clearTimeout( slideshowtime );
 		slideshowtime = setTimeout( function() {
-			navigate( 'next' );
-			startSlideshow();
+
+		element = $items.eq(current);
+
+               // Agrega la validación para detectar si se ha definido
+		// un slide contenedor de video de youtube a partir de la 
+		// clase .video
+		        if (element.hasClass('video')) {
+			    // dispara el evento click sobre el elemento
+			    // de navegación para detener o continuar 
+			    // la reproducción de slides
+			    navigation.$navPlayPause.trigger("click");
+
+			    // Id del video de youtube definido en el HTML
+			    vId = element.data('video-id');
+			    playerId = vId
+
+			    incrustarVideo(element, vId, playerId, autoPlay = 1)
+			
+			} else {
+
+			    navigate( 'next' );
+			    startSlideshow();
+
+			}
 		}, interval );
 
 	}
@@ -121,6 +146,74 @@ var cbpBGSlideshow = (function() {
 		clearTimeout( slideshowtime );
 	}
 
-	return { init : init };
+	/**
+	* función incrustarVideo
+	* 
+	* Detiene la ejecución del slideshow si el slide contiene
+	* algun video de youtube definido a partir de la clase .video
+	* y el atributo data-video-id desde el HTML
+	*
+	* Hace uso de la iframe_api de youtube para iniciar o detener
+	* la ejecución del video en el momento que el slide lo presenta
+	*
+	* @param el Object el actual slide que contiene el video
+	* @param vId String Id video de youtube
+	* @param playerId String Id del elemento donde se cargará el player
+	* @param autoPlay Boolean el video se ejecutará automaticamente. default = true 
+	* 
+	*/
+       function incrustarVideo(el, vId, playerId, autoPlay) {
 
+	    function iniciarVideo() {
+		$yt_videos[playerId].playVideo();
+		setTimeout(pararVideo, $video_timeout);
+	    }
+
+	    function pararVideo() {
+		$yt_videos[playerId].stopVideo();
+		navigate( 'next' );
+		startSlideshow();
+	    }
+	    
+	    function onPlayerReady(event) {
+		event.target.playVideo();
+	    }
+	    
+	    var done = false;
+	    function onPlayerStateChange(event) {
+		if($video_timeout != 0) {
+		    
+		    if (event.data == YT.PlayerState.PLAYING && !done) {
+			setTimeout(pararVideo, $video_timeout);
+			done = true;
+		    }
+		} else {
+		    pararVideo
+		}
+		
+	    }
+	    
+	    if (!(typeof $yt_videos[playerId] === "object")) {
+
+		el.append('<div id="'+playerId+'"></div>');
+		
+		$yt_videos[playerId] = new YT.Player(playerId, {
+		    width: '430',
+		    height: '241',
+		    videoId: vId,
+		    playerVars: {'autoplay': autoPlay, 'controls':1},
+		    events: {
+			'onReady': onPlayerReady,
+			'onStateChange': onPlayerStateChange
+		    }
+		});
+		
+	    } else {
+		console.log("reiniciando")
+		iniciarVideo();
+	    } 
+	}
+    
+    return { init : init };
+    
 })();
