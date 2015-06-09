@@ -74,12 +74,14 @@ var cbpBGSlideshow = (function() {
 		} );
 
 		navigation.$navPrev.on( 'click', function() { 
+		        pararTodos();
 			navigate( 'prev' ); 
 			if( isSlideshowActive ) { 
 				startSlideshow(); 
 			} 
 		} );
 		navigation.$navNext.on( 'click', function() { 
+		        pararTodos();
 			navigate( 'next' ); 
 			if( isSlideshowActive ) { 
 				startSlideshow(); 
@@ -146,6 +148,15 @@ var cbpBGSlideshow = (function() {
 		clearTimeout( slideshowtime );
 	}
 
+        function pararTodos() {
+	    if (!jQuery.isEmptyObject($yt_videos)) {
+		for(video in $yt_videos) {
+		    $yt_videos[playerId].stopVideo();		
+		}
+	    }
+	}
+
+
 	/**
 	* función incrustarVideo
 	* 
@@ -163,6 +174,18 @@ var cbpBGSlideshow = (function() {
 	* 
 	*/
        function incrustarVideo(el, vId, playerId, autoPlay) {
+        function iniciarVideo() {
+	    
+	    $yt_videos[playerId].seekTo(0);
+	    $yt_videos[playerId].playVideo();
+	
+	}
+
+        function pararVideo() {
+	    $yt_videos[playerId].stopVideo();
+	    navigate( 'next' );
+	    startSlideshow();
+	}
 
 	    function iniciarVideo() {
 
