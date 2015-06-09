@@ -29,7 +29,7 @@ var cbpBGSlideshow = (function() {
 		// true if the slideshow is active
 		isSlideshowActive = true,
 		// it takes 3.5 seconds to change the background image
-		interval = 3500;
+		interval = 500;
 
 	function init( config ) {
 
@@ -165,8 +165,10 @@ var cbpBGSlideshow = (function() {
        function incrustarVideo(el, vId, playerId, autoPlay) {
 
 	    function iniciarVideo() {
+
+		$yt_videos[playerId].seekTo(0);
 		$yt_videos[playerId].playVideo();
-		setTimeout(pararVideo, $video_timeout);
+	
 	    }
 
 	    function pararVideo() {
@@ -188,7 +190,12 @@ var cbpBGSlideshow = (function() {
 			done = true;
 		    }
 		} else {
-		    pararVideo
+		    if (event.data == YT.PlayerState.ENDED) {
+			pararVideo
+			navigate( 'next' );
+			startSlideshow();
+			done = true;
+		    }
 		}
 		
 	    }
