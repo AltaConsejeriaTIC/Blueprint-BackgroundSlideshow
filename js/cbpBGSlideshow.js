@@ -176,14 +176,16 @@ var cbpBGSlideshow = (function() {
        function incrustarVideo(el, vId, playerId, autoPlay) {
 
 	    function iniciarVideo() {
-
 		$yt_videos[playerId].seekTo(0);
 		$yt_videos[playerId].playVideo();
-	
+
+		$controls.find(".cbp-biplay").removeClass('cbp-biplay').addClass('cbp-bipause');
 	    }
 
 	    function pararVideo() {
 		$yt_videos[playerId].stopVideo();
+
+		$controls.find(".cbp-biplay").removeClass('cbp-biplay').addClass('cbp-bipause');
 		navigate( 'next' );
 		startSlideshow();
 	    }
@@ -202,9 +204,7 @@ var cbpBGSlideshow = (function() {
 		    }
 		} else {
 		    if (event.data == YT.PlayerState.ENDED) {
-			pararVideo
-			navigate( 'next' );
-			startSlideshow();
+			pararVideo();
 			done = true;
 		    }
 		}
@@ -227,7 +227,6 @@ var cbpBGSlideshow = (function() {
 		});
 		
 	    } else {
-		console.log("reiniciando")
 		iniciarVideo();
 	    } 
 	}
