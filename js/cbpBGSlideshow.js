@@ -174,18 +174,6 @@ var cbpBGSlideshow = (function() {
 	* 
 	*/
        function incrustarVideo(el, vId, playerId, autoPlay) {
-        function iniciarVideo() {
-	    
-	    $yt_videos[playerId].seekTo(0);
-	    $yt_videos[playerId].playVideo();
-	
-	}
-
-        function pararVideo() {
-	    $yt_videos[playerId].stopVideo();
-	    navigate( 'next' );
-	    startSlideshow();
-	}
 
 	    function iniciarVideo() {
 
